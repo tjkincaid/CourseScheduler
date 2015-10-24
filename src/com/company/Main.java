@@ -1,6 +1,10 @@
 package com.company;
+import com.sun.corba.se.spi.orbutil.threadpool.Work;
+import com.sun.org.apache.bcel.internal.generic.POP;
+import com.sun.org.apache.bcel.internal.generic.RET;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.tools.javac.comp.Annotate;
+import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 import sun.tools.tree.WhileStatement;
 
 import java.io.*;
@@ -39,8 +43,7 @@ public class Main {
 
         //load a new list with individual courses and their prereqs
         String[] WorkList = scheduleCourses(allCourses);
-        System.out.println("Back from scheduledCourses");
-        System.out.println(Arrays.toString(WorkList));
+        System.out.println("Your Course Work List looks like this: " + Arrays.toString(WorkList));
 
     }
 
@@ -85,9 +88,11 @@ public class Main {
     }
 
     public static String[] makeOutputList(List<Course> CourseCatalog){
-        String[] CourseList;
+        List<String> courseListOut = new ArrayList<String>();
+        //String[] CourseList;
         List<Course> WorkCatalog ;
         WorkCatalog = CourseCatalog;
+        String PopCourse= "PopCourse";
 
 //        Sort the WorkCatalog by CourseName, Do we really even need to do this?
 
@@ -100,45 +105,69 @@ public class Main {
 
 
         for (int i = 0; i < WorkCatalog.size(); i++) {
-            System.out.println(i + " COURSE = " + ( WorkCatalog.get(i)).courseName);
-            System.out.println(i + " PREREQS = " + ( WorkCatalog.get(i)).preReqs.toString());
+            System.out.println(i + " COURSE = " + (WorkCatalog.get(i)).courseName);
+            System.out.println(i + " PREREQS = " + (WorkCatalog.get(i)).preReqs.toString());
 
         }
 
-
         // Loop and pop the first empty repreq
 
+            //for (int i = 0; i < WorkCatalog.size(); i++) {
+
             for (int i = 0; i < WorkCatalog.size(); i++) {
-                if ((WorkCatalog.get(i)).preReqs.size()==0) {
-                    System.out.println("Your First Class is " + (WorkCatalog.get(i)).courseName);
-
-                    // delete that popped course from the rest of the preReqs
-                    //for each course
-                    for (int j = 0; j < WorkCatalog.size(); j++) {
-                        // Check each listed requirement
-                        for (int k = 0; k < (WorkCatalog.get(k)).preReqs.size(); k++) {
-
-                            /*THIS IS BROKE NEED TO LOOK AT AGAIN*/
-                            System.out.println("Removing from lists " + (WorkCatalog.get(j)).courseName);
-                            if ((WorkCatalog.get(j)).preReqs.toString().equals (WorkCatalog.get(i).courseName)) {
-                                (WorkCatalog.get(j)).preReqs.remove(k);
-                                System.out.println(" Removed "+ (WorkCatalog.get(j)).preReqs.remove(k) +
-                                " from " + (WorkCatalog.get(j)).courseName);
-                            }
-                        }
-                    }
-
+                if ((WorkCatalog.get(i)).preReqs.size() == 0) {
+                    //Get the course to be popped to the a variable
+                    PopCourse = (WorkCatalog.get(i)).courseName;
+                    System.out.println("Your First Class is " + PopCourse);
+                    //Remove the course object
+                    WorkCatalog.remove(i);
+                    courseListOut.add(PopCourse);
                 }
             }
 
+        WorkCatalog = removeReqs(WorkCatalog, PopCourse);
+           // delete that popped course from the rest of the preReqs
+            //for each course
+//            for (int j = 0; j < WorkCatalog.size(); j++) {
+//                // Check each listed requirement
+//                System.out.println("This is the Course that you are checking Prereqs "+ (WorkCatalog.get(j).courseName));
+//                for (int k = 0; k < WorkCatalog.get(j).preReqs.size(); k++) {
+//                    if ((WorkCatalog.get(j).preReqs.get(k)).equals(PopCourse)) {
+//                        System.out.println("This is the Prereq you are looking at " + WorkCatalog.get(j).preReqs.get(k));
+//                        System.out.println( WorkCatalog.get(j).preReqs.get(k) + " REMOVED from LIST");
+//                        WorkCatalog.get(j).preReqs.remove(k);
+//
+//                    }
+//
+//                }
+
+            //}
 
 
 
         // Start again from the top wash rinse repeat
 
-        CourseList = null;
-        return CourseList;
+        String[] CourseListRet = new String[courseListOut.size()];
+        CourseListRet = courseListOut.toArray(CourseListRet);
+        return CourseListRet;
     }
 
+    public static List<Course> removeReqs(List<Course> WorkCatalog, String PopCourse) {
 
+        List<Course> courseCatalog = new ArrayList<>(WorkCatalog);
+        for (int j = 0; j < courseCatalog.size(); j++) {
+            // Check each listed requirement
+            System.out.println("This is the Course that you are checking Prereqs " + (courseCatalog.get(j).courseName));
+            for (int k = 0; k < courseCatalog.get(j).preReqs.size(); k++) {
+                if ((courseCatalog.get(j).preReqs.get(k)).equals(PopCourse)) {
+                    System.out.println("This is the Prereq you are looking at " + WorkCatalog.get(j).preReqs.get(k));
+                    System.out.println(WorkCatalog.get(j).preReqs.get(k) + " REMOVED from LIST");
+                    courseCatalog.get(j).preReqs.remove(k);
+
+                }
+
+            }
+        }
+        return courseCatalog;
+    }
 }
