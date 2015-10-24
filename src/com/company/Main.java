@@ -1,4 +1,8 @@
 package com.company;
+import com.sun.source.tree.WhileLoopTree;
+import com.sun.tools.javac.comp.Annotate;
+import sun.tools.tree.WhileStatement;
+
 import java.io.*;
 import java.util.*;
 
@@ -26,8 +30,12 @@ public class Main {
                 "ECE201: CSE111 INTR100",
                 "ECE111: INTR100",
                 "CSE243: CSE254",
-                "INTR100: INTR100"
+                "INTR100:"
         };
+
+/*        The method should return:
+        {"INTR100","CSE101","CSE111","ECE111","ECE201","MATH210","CSE254","CSE221","CSE2
+            43","CSE244","CSE258"}*/
 
         //load a new list with individual courses and their prereqs
         String[] WorkList = scheduleCourses(allCourses);
@@ -54,7 +62,12 @@ public class Main {
             System.out.println("Your Parent Course is " + ParentCourse);
 
             //split prereqs by " "
-            String[] PreReqSplit = courseAndPreReq[1].split(" ");
+            String[] PreReqSplit;
+            if (courseAndPreReq.length > 1) {
+                PreReqSplit = courseAndPreReq[1].split(" ");
+                System.out.println(PreReqSplit);
+            }else {PreReqSplit =courseAndPreReq[0].split(" ");}
+
 
             // run through the rest of the children and add them to a new list
             for (int j = 1; j < PreReqSplit.length; j++) {
@@ -73,28 +86,55 @@ public class Main {
 
     public static String[] makeOutputList(List<Course> CourseCatalog){
         String[] CourseList;
-        List<Course> WorkCatalog = new ArrayList<>();
+        List<Course> WorkCatalog ;
         WorkCatalog = CourseCatalog;
 
 //        Sort the WorkCatalog by CourseName, Do we really even need to do this?
 
 //        Pop the first CourseName without a PreReq, Add to list and remove from class
         int noReqCount = 0;
+
+        // order this by COURSE so that the FIRST course without a PREREQ is the one to use
+
+        Collections.sort(WorkCatalog);
+
+
         for (int i = 0; i < WorkCatalog.size(); i++) {
-//            System.out.println(WorkCatalog.size());
-//            System.out.println(WorkCatalog.get(i));
-            System.out.println(i + " COURSE = " + ((Course) WorkCatalog.get(i)).courseName.toString());
-            System.out.println(i + " PREREQS = " + ((Course) WorkCatalog.get(i)).preReqs.toString());
-            // order this by COURSE so that the FIRST course without a PREREQ is the one to use
-
-            // Loop and pop the first empty repreq
-
-            // delete that popped course from the rest of the preReqs
-
-            // Start again from the top wash rinse repeat
+            System.out.println(i + " COURSE = " + ( WorkCatalog.get(i)).courseName);
+            System.out.println(i + " PREREQS = " + ( WorkCatalog.get(i)).preReqs.toString());
 
         }
-//        Delete the PreReqs in the Catalog that have the same name
+
+
+        // Loop and pop the first empty repreq
+
+            for (int i = 0; i < WorkCatalog.size(); i++) {
+                if ((WorkCatalog.get(i)).preReqs.size()==0) {
+                    System.out.println("Your First Class is " + (WorkCatalog.get(i)).courseName);
+
+                    // delete that popped course from the rest of the preReqs
+                    //for each course
+                    for (int j = 0; j < WorkCatalog.size(); j++) {
+                        // Check each listed requirement
+                        for (int k = 0; k < (WorkCatalog.get(k)).preReqs.size(); k++) {
+
+                            /*THIS IS BROKE NEED TO LOOK AT AGAIN*/
+                            System.out.println("Removing from lists " + (WorkCatalog.get(j)).courseName);
+                            if ((WorkCatalog.get(j)).preReqs.toString().equals (WorkCatalog.get(i).courseName)) {
+                                (WorkCatalog.get(j)).preReqs.remove(k);
+                                System.out.println(" Removed "+ (WorkCatalog.get(j)).preReqs.remove(k) +
+                                " from " + (WorkCatalog.get(j)).courseName);
+                            }
+                        }
+                    }
+
+                }
+            }
+
+
+
+
+        // Start again from the top wash rinse repeat
 
         CourseList = null;
         return CourseList;
