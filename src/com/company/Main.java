@@ -42,59 +42,57 @@ public class Main {
         //System.out.println(Arrays.toString(courseList));
         // process parent course and pre reqs to add to a list
 
-        List<Course> CourseCatalog = new ArrayList<>();
+        List<Course> courseCatalog = new ArrayList<>();
         for (int i = 0; i < courseList.length; i++) {
-            List<String> PreReq = new ArrayList<>();
+            List<String> preReq = new ArrayList<>();
 
             // isolate the Parent course to a string
             String[] courseAndPreReq = courseList[i].split(":");
-            String ParentCourse = courseAndPreReq[0];
-            ParentCourse.replace(":", "");
+            String parentCourse = courseAndPreReq[0];
+            parentCourse.replace(":", "");
             //System.out.println("Your Parent Course is " + ParentCourse);
 
             //split prereqs by " "
-            String[] PreReqSplit;
+            String[] preReqSplit;
             if (courseAndPreReq.length > 1) {
-                PreReqSplit = courseAndPreReq[1].split(" ");
+                preReqSplit = courseAndPreReq[1].split(" ");
                 //System.out.println(PreReqSplit);
-            }else {PreReqSplit =courseAndPreReq[0].split(" ");}
+            }else {preReqSplit =courseAndPreReq[0].split(" ");}
 
             // run through the rest of the children and add them to a new list
-            for (int j = 1; j < PreReqSplit.length; j++) {
-                PreReq.add(PreReqSplit[j]);
+            for (int j = 1; j < preReqSplit.length; j++) {
+                preReq.add(preReqSplit[j]);
             }
             //System.out.println("Your Child Courses are " + PreReq);
-            CourseCatalog.add(new Course(ParentCourse, PreReq));
+            courseCatalog.add(new Course(parentCourse, preReq));
         }
 
-        courseList = makeOutputList(CourseCatalog);
+        String[] scheduledCourses = sequenceCourses(courseCatalog);
 
-        return courseList;
+        return scheduledCourses;
     }
 
     /**
      *
-     * @param CourseCatalog
+     * @param courseCatalog
      * @return string[] CourseListRet
      * Takes in a string[] of course and their preReqs.
      * Places the data in a List of Course/s
      * Traverse the list and export a String[] with the most efficient Course path
      * IF there is an error then out the error to String[]
      */
-    public static String[] makeOutputList(List<Course> CourseCatalog){
+    public static String[] sequenceCourses(List<Course> courseCatalog){
         List<String> courseListOut = new ArrayList<String>();
         //String[] CourseList;
-        List<Course> workCatalog ;
-        workCatalog = CourseCatalog;
-        String popCourse= "popCourse";
+        //List<Course> workCatalog ;
+        //workCatalog = CourseCatalog;
+        String popCourse = null;
 
 
 
 //      Pop the first CourseName without a PreReq, Add to list and remove from class
-        int noReqCount = 0;
-
         // order this by COURSE so that the FIRST course without a PREREQ is the one to use
-        Collections.sort(workCatalog);
+        Collections.sort(courseCatalog);
 //        for (int i = 0; i < workCatalog.size(); i++) {
 //            System.out.println(i + " COURSE = " + (workCatalog.get(i)).courseName);
 //            System.out.println(i + " PREREQS = " + (workCatalog.get(i)).preReqs.toString());
@@ -104,28 +102,29 @@ public class Main {
         // Loop and pop the first empty repreq
         // @PETE I looked to refactor this but it has 2 elements it would need to either return or globally change
         // @PETE so I didn't touch it. Design Ideas?
-        int originalSize = workCatalog.size();
+        int originalSize = courseCatalog.size();
         for (int j = 0; j < originalSize; j++) {
-            for (int i = 0; i < workCatalog.size(); i++) {
-                if ((workCatalog.get(i)).preReqs.size() == 0) {
+            for (int i = 0; i < courseCatalog.size(); i++) {
+                if ((courseCatalog.get(i)).getPreReqs().size() == 0) {
                     //Get the course to be popped to the a variable
-                    popCourse = (workCatalog.get(i)).courseName;
+                    popCourse = (courseCatalog.get(i)).getCourseName();
                     //System.out.println("Your First Class is " + popCourse);
                     //Remove the course object
-                    workCatalog.remove(i);
+                    courseCatalog.remove(i);
                     courseListOut.add(popCourse);
                     break;
                 }
             }
             // Call Method to remove preReq courses that match the course name being popped
-            workCatalog = removeReqs(workCatalog, popCourse);
+            courseCatalog = removeReqs(courseCatalog, popCourse);
 
         }
 
         // Start again from the top wash rinse repeat
-        String[] CourseListRet = new String[courseListOut.size()];
-        CourseListRet = courseListOut.toArray(CourseListRet);
-        return CourseListRet;
+        String[] courseListRet = new String[courseListOut.size()];
+        courseListRet = courseListOut.toArray(courseListRet);
+
+        return courseListRet;
     }
 
 
@@ -143,11 +142,11 @@ public class Main {
         for (int j = 0; j < courseCatalog.size(); j++) {
             // Check each listed requirement
             //System.out.println("This is the Course that you are checking Prereqs " + (courseCatalog.get(j).courseName));
-            for (int k = 0; k < courseCatalog.get(j).preReqs.size(); k++) {
-                if ((courseCatalog.get(j).preReqs.get(k)).equals(pCourse)) {
+            for (int k = 0; k < courseCatalog.get(j).getPreReqs().size(); k++) {
+                if ((courseCatalog.get(j).getPreReqs().get(k)).equals(pCourse)) {
                     //System.out.println("This is the Prereq you are looking at " + WorkCatalog.get(j).preReqs.get(k));
                     //System.out.println(WorkCatalog.get(j).preReqs.get(k) + " REMOVED from LIST");
-                    courseCatalog.get(j).preReqs.remove(k);
+                    courseCatalog.get(j).getPreReqs().remove(k);
 
                 }
             }
