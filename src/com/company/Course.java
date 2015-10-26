@@ -1,13 +1,16 @@
 package com.company;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
  * Created by TJ on 10/22/15.
+ *
  */
-public class Course implements Comparable<Course>{
+public class Course {
     private String courseName;
+    private String courseNumber;
     private List<String> preReqs;
 
     public String getCourseName(){
@@ -16,6 +19,14 @@ public class Course implements Comparable<Course>{
 
     public void setCourseName(String courseName){
         this.courseName = courseName;
+    }
+
+    public String getCourseNumber(){
+        return this.courseNumber;
+    }
+
+    public void setCourseNumber(String courseNumber){
+        this.courseNumber = courseNumber;
     }
 
     public List<String> getPreReqs(){
@@ -27,15 +38,11 @@ public class Course implements Comparable<Course>{
     }
 
 
-    public Course(String name, List<String> preReq)
+    public Course(String name, String num, List<String> preReq)
     {
         this.courseName = name;
+        this.courseNumber = num;
         this.preReqs = preReq;
     }
 
-
-    public int compareTo(Course n) {
-        int lastCmp = courseName.compareTo(n.courseName);
-        return lastCmp;
-    }
 }
